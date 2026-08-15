@@ -1,0 +1,215 @@
+<!doctype html>
+<html>
+    <head>
+        <!-- BASE AR.js VALIDADA NOS TESTES ANTERIORES -->
+        <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+        <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+        <script src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
+        <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-detector.js"></script>
+        <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
+    </head>
+
+    <body style="margin: 0; overflow: hidden;">
+
+        <!-- PAINEL ÚNICO: MUDA CONFORME O MARCADOR RECONHECIDO -->
+        <div
+            id="info-elemento"
+            style="
+                display: none;
+                position: fixed;
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                z-index: 9999;
+                background: rgba(0,0,0,0.88);
+                color: white;
+                border: 2px solid white;
+                border-radius: 12px;
+                padding: 11px 12px;
+                font-family: Arial, sans-serif;
+                font-size: 15px;
+                line-height: 1.35;
+                text-align: center;
+            "
+        >
+            <div id="nome-elemento"
+                 style="font-size: 22px; font-weight: bold; margin-bottom: 4px;">
+            </div>
+
+            <div id="linha-1"></div>
+            <div id="linha-2"></div>
+            <div id="linha-3" style="margin-top: 4px;"></div>
+            <div id="linha-4"></div>
+            <div id="linha-5" style="margin-top: 4px;"></div>
+        </div>
+
+        <a-scene
+            vr-mode-ui="enabled: false;"
+            loading-screen="enabled: false;"
+            renderer="logarithmicDepthBuffer: true;"
+            arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+            id="scene"
+            embedded
+            gesture-detector
+        >
+
+            <!-- MODELOS 3D -->
+            <a-assets>
+                <a-asset-item
+                    id="modelo-na"
+                    src="assets/modelos/na.glb"
+                ></a-asset-item>
+
+                <a-asset-item
+                    id="modelo-mg"
+                    src="assets/modelos/mg.glb"
+                ></a-asset-item>
+            </a-assets>
+
+            <!-- ========================= -->
+            <!-- MARCADOR DO SÓDIO -->
+            <!-- ========================= -->
+            <a-marker
+                id="marker-na"
+                type="pattern"
+                preset="custom"
+                url="assets/marcadores/na.patt"
+                raycaster="objects: .clickable"
+                emitevents="true"
+                cursor="fuse: false; rayOrigin: mouse;"
+            >
+                <a-entity
+                    id="modelo-sodio"
+                    scale="0.5607348115010105 0.5607348115010105 0.5607348115010105"
+                    animation-mixer="loop: repeat"
+                    gltf-model="#modelo-na"
+                    class="clickable"
+                    gesture-handler
+                ></a-entity>
+            </a-marker>
+
+            <!-- ========================= -->
+            <!-- MARCADOR DO MAGNÉSIO -->
+            <!-- ========================= -->
+            <a-marker
+                id="marker-mg"
+                type="pattern"
+                preset="custom"
+                url="assets/marcadores/mg.patt"
+                raycaster="objects: .clickable"
+                emitevents="true"
+                cursor="fuse: false; rayOrigin: mouse;"
+            >
+                <a-entity
+                    id="modelo-magnesio"
+                    scale="0.5607348115010105 0.5607348115010105 0.5607348115010105"
+                    animation-mixer="loop: repeat"
+                    gltf-model="#modelo-mg"
+                    class="clickable"
+                    gesture-handler
+                ></a-entity>
+            </a-marker>
+
+            <a-entity camera></a-entity>
+        </a-scene>
+
+        <script>
+            var painel = document.getElementById("info-elemento");
+            var nome = document.getElementById("nome-elemento");
+            var linha1 = document.getElementById("linha-1");
+            var linha2 = document.getElementById("linha-2");
+            var linha3 = document.getElementById("linha-3");
+            var linha4 = document.getElementById("linha-4");
+            var linha5 = document.getElementById("linha-5");
+
+            var markerNa = document.getElementById("marker-na");
+            var markerMg = document.getElementById("marker-mg");
+
+            var naVisivel = false;
+            var mgVisivel = false;
+            var elementoAtual = null;
+
+            var dados = {
+                na: {
+                    nome: "Sódio — Na",
+                    linha1: "<strong>Número atômico:</strong> 11 &nbsp;•&nbsp; <strong>Grupo:</strong> 1 &nbsp;•&nbsp; <strong>Período:</strong> 3",
+                    linha2: "<strong>Metal alcalino</strong> &nbsp;•&nbsp; <strong>Estado:</strong> sólido",
+                    linha3: "<strong>Distribuição eletrônica:</strong> 2–8–1",
+                    linha4: "<strong>Configuração:</strong> 1s² 2s² 2p⁶ 3s¹",
+                    linha5: "<strong>1 elétron de valência</strong> &nbsp;•&nbsp; <strong>Íon mais comum:</strong> Na⁺"
+                },
+
+                mg: {
+                    nome: "Magnésio — Mg",
+                    linha1: "<strong>Número atômico:</strong> 12 &nbsp;•&nbsp; <strong>Grupo:</strong> 2 &nbsp;•&nbsp; <strong>Período:</strong> 3",
+                    linha2: "<strong>Metal alcalino-terroso</strong> &nbsp;•&nbsp; <strong>Estado:</strong> sólido",
+                    linha3: "<strong>Distribuição eletrônica:</strong> 2–8–2",
+                    linha4: "<strong>Configuração:</strong> 1s² 2s² 2p⁶ 3s²",
+                    linha5: "<strong>2 elétrons de valência</strong> &nbsp;•&nbsp; <strong>Íon mais comum:</strong> Mg²⁺"
+                }
+            };
+
+            function mostrarElemento(chave) {
+                var d = dados[chave];
+
+                elementoAtual = chave;
+
+                nome.innerHTML = d.nome;
+                linha1.innerHTML = d.linha1;
+                linha2.innerHTML = d.linha2;
+                linha3.innerHTML = d.linha3;
+                linha4.innerHTML = d.linha4;
+                linha5.innerHTML = d.linha5;
+
+                painel.style.display = "block";
+            }
+
+            function atualizarPainelAposPerda(chavePerdida) {
+                /*
+                  Se o aluno estiver mostrando os dois marcadores ao mesmo tempo,
+                  o painel continua exibindo o que ainda estiver visível.
+                */
+
+                if (chavePerdida === "na") {
+                    naVisivel = false;
+
+                    if (mgVisivel) {
+                        mostrarElemento("mg");
+                    } else {
+                        painel.style.display = "none";
+                        elementoAtual = null;
+                    }
+                }
+
+                if (chavePerdida === "mg") {
+                    mgVisivel = false;
+
+                    if (naVisivel) {
+                        mostrarElemento("na");
+                    } else {
+                        painel.style.display = "none";
+                        elementoAtual = null;
+                    }
+                }
+            }
+
+            markerNa.addEventListener("markerFound", function () {
+                naVisivel = true;
+                mostrarElemento("na");
+            });
+
+            markerNa.addEventListener("markerLost", function () {
+                atualizarPainelAposPerda("na");
+            });
+
+            markerMg.addEventListener("markerFound", function () {
+                mgVisivel = true;
+                mostrarElemento("mg");
+            });
+
+            markerMg.addEventListener("markerLost", function () {
+                atualizarPainelAposPerda("mg");
+            });
+        </script>
+    </body>
+</html>
