@@ -1,0 +1,53 @@
+window.ELEMENTOS = [
+    {
+        id: "na",
+        nome: "Sódio",
+        simbolo: "Na",
+        numeroAtomico: 11,
+        grupo: 1,
+        periodo: 3,
+        familia: "Metal alcalino",
+        estado: "sólido",
+        distribuicao: "2–8–1",
+        configuracao: "1s² 2s² 2p⁶ 3s¹",
+        valencia: "1 elétron de valência",
+        ion: "Na⁺",
+        marcador: "assets/marcadores/na.patt",
+        modelo: "assets/modelos/na.glb",
+        audio: "assets/audio/na.mp3"
+    },
+    {
+        id: "mg",
+        nome: "Magnésio",
+        simbolo: "Mg",
+        numeroAtomico: 12,
+        grupo: 2,
+        periodo: 3,
+        familia: "Metal alcalino-terroso",
+        estado: "sólido",
+        distribuicao: "2–8–2",
+        configuracao: "1s² 2s² 2p⁶ 3s²",
+        valencia: "2 elétrons de valência",
+        ion: "Mg²⁺",
+        marcador: "assets/marcadores/mg.patt",
+        modelo: "assets/modelos/mg.glb",
+        audio: "assets/audio/mg.mp3"
+    },
+    {
+        id: "al",
+        nome: "Alumínio",
+        simbolo: "Al",
+        numeroAtomico: 13,
+        grupo: 13,
+        periodo: 3,
+        familia: "Família do boro",
+        estado: "sólido",
+        distribuicao: "2–8–3",
+        configuracao: "1s² 2s² 2p⁶ 3s² 3p¹",
+        valencia: "3 elétrons de valência",
+        ion: "Al³⁺",
+        marcador: "assets/marcadores/al.patt",
+        modelo: "assets/modelos/al.glb",
+        audio: "assets/audio/al.mp3"
+    }
+];
