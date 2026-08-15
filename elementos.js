@@ -80,7 +80,7 @@ window.ELEMENTOS = [
         configuracao: "1s² 2s² 2p⁶ 3s² 3p³",
         valencia: "5 elétrons de valência",
         ion: "P³⁻ (fosfeto)",
-        marcador: "assets/marcadores/p.patt",
+        marcador: "assets/marcadores/p-v2.patt",
         modelo: "assets/modelos/p.glb",
         audio: "assets/audio/p.mp3"
     }
