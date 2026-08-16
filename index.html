@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+<head>
+<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+<script src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
+<script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-detector.js"></script>
+<script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
+<script src="elementos.js"></script>
+</head>
+
+<body style="margin:0; overflow:hidden;">
+
+<button id="botao-explorar" type="button"
+style="display:none;position:fixed;right:14px;bottom:18px;z-index:10000;background:rgba(0,0,0,.88);color:white;border:2px solid white;border-radius:14px;padding:12px 16px;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;cursor:pointer;">
+☰ Explorar
+</button>
+
+<button id="botao-recentrar" type="button"
+style="display:none;position:fixed;left:14px;bottom:18px;z-index:10000;background:rgba(0,0,0,.78);color:white;border:1px solid white;border-radius:12px;padding:10px 13px;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;cursor:pointer;">
+⌖ Recentrar
+</button>
+
+<div id="menu-elemento"
+style="display:none;position:fixed;left:10px;right:10px;bottom:10px;z-index:10001;background:rgba(0,0,0,.93);color:white;border:2px solid white;border-radius:14px;padding:14px;font-family:Arial,sans-serif;font-size:15px;line-height:1.4;text-align:left;max-height:72%;overflow-y:auto;">
+
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
+<div id="nome-elemento" style="font-size:23px;font-weight:bold;"></div>
+<button id="botao-fechar" type="button" aria-label="Fechar menu"
+style="flex:0 0 auto;background:white;color:black;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;font-weight:bold;cursor:pointer;">×</button>
+</div>
+
+<div style="border-top:1px solid rgba(255,255,255,.55);padding-top:10px;">
+<div id="linha-1"></div>
+<div id="linha-2" style="margin-top:3px;"></div>
+<div id="linha-3" style="margin-top:8px;"></div>
+<div id="linha-4" style="margin-top:3px;"></div>
+<div id="linha-5" style="margin-top:8px;"></div>
+</div>
+
+<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.55);">
+<button type="button" disabled
+style="width:100%;margin-bottom:8px;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,.65);background:rgba(255,255,255,.12);color:rgba(255,255,255,.70);font-size:15px;">
+🔊 Ouvir descrição — em breve
+</button>
+
+<button type="button" disabled
+style="width:100%;margin-bottom:8px;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,.65);background:rgba(255,255,255,.12);color:rgba(255,255,255,.70);font-size:15px;">
+💡 Curiosidades — em breve
+</button>
+
+<button type="button" disabled
+style="width:100%;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,.65);background:rgba(255,255,255,.12);color:rgba(255,255,255,.70);font-size:15px;">
+⚛ Explorar formação do íon — em breve
+</button>
+</div>
+</div>
+
+<a-scene
+vr-mode-ui="enabled: false;"
+loading-screen="enabled: false;"
+renderer="logarithmicDepthBuffer: true;"
+arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+id="scene"
+embedded
+gesture-detector>
+
+<a-assets id="assets-dinamicos"></a-assets>
+
+<a-entity id="camera-ra" camera>
+    <a-entity
+        id="modelo-persistente"
+        position="0 0 -2.5"
+        scale="0.5607348115010105 0.5607348115010105 0.5607348115010105"
+        rotation="0 0 0"
+        visible="false"
+        class="clickable"
+        gesture-handler>
+    </a-entity>
+</a-entity>
+
+</a-scene>
+
+<script>
+(function(){
+
+var scene = document.getElementById("scene");
+var assets = document.getElementById("assets-dinamicos");
+var modeloPersistente = document.getElementById("modelo-persistente");
+
+var botaoExplorar = document.getElementById("botao-explorar");
+var botaoRecentrar = document.getElementById("botao-recentrar");
+var botaoFechar = document.getElementById("botao-fechar");
+var menu = document.getElementById("menu-elemento");
+
+var nome = document.getElementById("nome-elemento");
+var linha1 = document.getElementById("linha-1");
+var linha2 = document.getElementById("linha-2");
+var linha3 = document.getElementById("linha-3");
+var linha4 = document.getElementById("linha-4");
+var linha5 = document.getElementById("linha-5");
+
+var elementoAtual = null;
+var ESCALA_BASE = "0.5607348115010105 0.5607348115010105 0.5607348115010105";
+
+function preencherDados(e){
+    elementoAtual = e;
+
+    nome.innerHTML = e.nome + " — " + e.simbolo;
+
+    linha1.innerHTML =
+        "<strong>Número atômico:</strong> " + e.numeroAtomico +
+        " &nbsp;•&nbsp; <strong>Grupo:</strong> " + e.grupo +
+        " &nbsp;•&nbsp; <strong>Período:</strong> " + e.periodo;
+
+    linha2.innerHTML =
+        "<strong>" + e.familia + "</strong>" +
+        " &nbsp;•&nbsp; <strong>Estado:</strong> " + e.estado;
+
+    linha3.innerHTML =
+        "<strong>Distribuição eletrônica:</strong> " + e.distribuicao;
+
+    linha4.innerHTML =
+        "<strong>Configuração:</strong> " + e.configuracao;
+
+    linha5.innerHTML =
+        "<strong>" + e.valencia + "</strong>" +
+        " &nbsp;•&nbsp; <strong>Íon mais comum:</strong> " + e.ion;
+
+    botaoExplorar.innerHTML = "☰ Explorar " + e.simbolo;
+}
+
+function recentrarModelo(){
+    modeloPersistente.setAttribute("position", "0 0 -2.5");
+    modeloPersistente.setAttribute("rotation", "0 0 0");
+    modeloPersistente.setAttribute("scale", ESCALA_BASE);
+}
+
+function selecionarElemento(e){
+    preencherDados(e);
+
+    modeloPersistente.setAttribute(
+        "gltf-model",
+        "#modelo-" + e.id
+    );
+
+    recentrarModelo();
+    modeloPersistente.setAttribute("visible", "true");
+
+    menu.style.display = "none";
+    botaoExplorar.style.display = "block";
+    botaoRecentrar.style.display = "block";
+}
+
+botaoExplorar.addEventListener("click", function(){
+    if(!elementoAtual) return;
+    botaoExplorar.style.display = "none";
+    botaoRecentrar.style.display = "none";
+    menu.style.display = "block";
+});
+
+botaoFechar.addEventListener("click", function(){
+    menu.style.display = "none";
+    if(elementoAtual){
+        botaoExplorar.style.display = "block";
+        botaoRecentrar.style.display = "block";
+    }
+});
+
+botaoRecentrar.addEventListener("click", function(){
+    if(!elementoAtual) return;
+    recentrarModelo();
+});
+
+window.ELEMENTOS.forEach(function(e){
+
+    var asset = document.createElement("a-asset-item");
+    asset.setAttribute("id", "modelo-" + e.id);
+    asset.setAttribute("src", e.modelo);
+    assets.appendChild(asset);
+
+    var marker = document.createElement("a-marker");
+    marker.setAttribute("id", "marker-" + e.id);
+    marker.setAttribute("type", "pattern");
+    marker.setAttribute("preset", "custom");
+    marker.setAttribute("url", e.marcador);
+    marker.setAttribute("emitevents", "true");
+
+    scene.appendChild(marker);
+
+    marker.addEventListener("markerFound", function(){
+        selecionarElemento(e);
+    });
+
+    /* markerLost propositalmente não faz nada */
+});
+
+})();
+</script>
+
+</body>
+</html>
